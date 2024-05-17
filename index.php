@@ -45,7 +45,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Fetch chairs
 $sql = "SELECT * FROM chairs";
 $chairs = $conn->query($sql);
-
 ?>
 
 <!DOCTYPE html>
@@ -70,20 +69,11 @@ $chairs = $conn->query($sql);
             padding-top: 30px;
             min-height: 70px;
             border-bottom: #77a9d1 3px solid;
+            text-align: center;
         }
-        header a {
-            color: #fff;
-            text-decoration: none;
-            text-transform: uppercase;
-            font-size: 16px;
-        }
-        header ul {
-            padding: 0;
-            list-style: none;
-        }
-        header li {
-            display: inline;
-            padding: 0 20px 0 20px;
+        header h1 {
+            margin: 0;
+            padding-bottom: 10px;
         }
         .main {
             padding: 15px;
@@ -102,10 +92,15 @@ $chairs = $conn->query($sql);
             border-radius: 5px;
             background: #f9f9f9;
             text-align: center;
+            cursor: pointer;
             transition: background 0.3s;
         }
         .chair:hover {
             background: #e9e9e9;
+        }
+        .chair.selected {
+            background: #77a9d1;
+            color: #fff;
         }
         form {
             margin-top: 20px;
@@ -117,8 +112,7 @@ $chairs = $conn->query($sql);
         input[type="text"],
         input[type="number"],
         input[type="date"],
-        input[type="time"],
-        select {
+        input[type="time"] {
             width: 100%;
             padding: 10px;
             margin: 5px 0 20px 0;
@@ -168,18 +162,13 @@ $chairs = $conn->query($sql);
             <h2>Book a Chair</h2>
             <div class="chairs">
                 <?php while($row = $chairs->fetch_assoc()) { ?>
-                    <div class="chair">
+                    <div class="chair" data-chair-id="<?= $row['id'] ?>">
                         <h3><?= $row['name'] ?></h3>
                     </div>
                 <?php } ?>
             </div>
             <form method="post" action="">
-                <label for="chair_id">Choose a chair:</label>
-                <select name="chair_id" id="chair_id" required>
-                    <?php while($row = $chairs->fetch_assoc()) { ?>
-                        <option value="<?= $row['id'] ?>"><?= $row['name'] ?></option>
-                    <?php } ?>
-                </select>
+                <input type="hidden" name="chair_id" id="chair_id" required>
                 <label for="user_id">User ID:</label>
                 <input type="number" name="user_id" id="user_id" required>
                 <label for="booking_date">Date:</label>
@@ -209,6 +198,17 @@ $chairs = $conn->query($sql);
             </table>
         </div>
     </div>
+    <script>
+        document.querySelectorAll('.chair').forEach(chair => {
+            chair.addEventListener('click', function() {
+                document.querySelectorAll('.chair').forEach(chair => {
+                    chair.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                document.getElementById('chair_id').value = this.getAttribute('data-chair-id');
+            });
+        });
+    </script>
 </body>
 </html>
 
