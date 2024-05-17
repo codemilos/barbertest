@@ -10,13 +10,14 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Anslutningsfel: " . $conn->connect_error);
 }
 
 // Handle booking request
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $chair_id = $_POST['chair_id'];
-    $user_id = $_POST['user_id'];
+    $name = $_POST['name'];
+    $phone_number = $_POST['phone_number'];
     $booking_date = $_POST['booking_date'];
     $booking_time = $_POST['booking_time'];
 
@@ -28,16 +29,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        echo "<script>alert('Time slot already booked.');</script>";
+        echo "<script>alert('Tid redan bokad.');</script>";
     } else {
         // Insert booking
-        $sql = "INSERT INTO bookings (chair_id, user_id, booking_date, booking_time) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO bookings (chair_id, name, phone_number, booking_date, booking_time) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iiss", $chair_id, $user_id, $booking_date, $booking_time);
+        $stmt->bind_param("issss", $chair_id, $name, $phone_number, $booking_date, $booking_time);
         if ($stmt->execute()) {
-            echo "<script>alert('Booking successful!');</script>";
+            echo "<script>alert('Bokning lyckades!');</script>";
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            echo "Fel: " . $sql . "<br>" . $conn->error;
         }
     }
 }
@@ -50,7 +51,7 @@ $chairs = $conn->query($sql);
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Barbershop Booking System</title>
+    <title>Bokningssystem för Frisörsalong</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -110,7 +111,7 @@ $chairs = $conn->query($sql);
             margin-top: 10px;
         }
         input[type="text"],
-        input[type="number"],
+        input[type="tel"],
         input[type="date"],
         input[type="time"] {
             width: 100%;
@@ -154,12 +155,12 @@ $chairs = $conn->query($sql);
 <body>
     <header>
         <div class="container">
-            <h1>Barbershop Booking System</h1>
+            <h1>Bokningssystem för Frisörsalong</h1>
         </div>
     </header>
     <div class="container">
         <div class="main">
-            <h2>Book a Chair</h2>
+            <h2>Boka en Stol</h2>
             <div class="chairs">
                 <?php while($row = $chairs->fetch_assoc()) { ?>
                     <div class="chair" data-chair-id="<?= $row['id'] ?>">
@@ -169,30 +170,33 @@ $chairs = $conn->query($sql);
             </div>
             <form method="post" action="">
                 <input type="hidden" name="chair_id" id="chair_id" required>
-                <label for="user_id">User ID:</label>
-                <input type="number" name="user_id" id="user_id" required>
-                <label for="booking_date">Date:</label>
+                <label for="name">Namn:</label>
+                <input type="text" name="name" id="name" required>
+                <label for="phone_number">Telefonnummer:</label>
+                <input type="tel" name="phone_number" id="phone_number" required>
+                <label for="booking_date">Datum:</label>
                 <input type="date" name="booking_date" id="booking_date" required>
-                <label for="booking_time">Time:</label>
+                <label for="booking_time">Tid:</label>
                 <input type="time" name="booking_time" id="booking_time" required>
-                <input type="submit" value="Book">
+                <input type="submit" value="Boka">
             </form>
-            <h2>Booked Times</h2>
+            <h2>Bokade Tider</h2>
             <table>
                 <tr>
-                    <th>Chair</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>User ID</th>
+                    <th>Stol</th>
+                    <th>Datum</th>
+                    <th>Tid</th>
+                    <th>Namn</th>
+                    <th>Telefonnummer</th>
                 </tr>
                 <?php
-                $sql = "SELECT chairs.name AS chair_name, bookings.booking_date, bookings.booking_time, bookings.user_id 
+                $sql = "SELECT chairs.name AS chair_name, bookings.booking_date, bookings.booking_time, bookings.name, bookings.phone_number 
                         FROM bookings 
                         JOIN chairs ON bookings.chair_id = chairs.id 
                         ORDER BY bookings.booking_date, bookings.booking_time";
                 $result = $conn->query($sql);
                 while($row = $result->fetch_assoc()) {
-                    echo "<tr><td>{$row['chair_name']}</td><td>{$row['booking_date']}</td><td>{$row['booking_time']}</td><td>{$row['user_id']}</td></tr>";
+                    echo "<tr><td>{$row['chair_name']}</td><td>{$row['booking_date']}</td><td>{$row['booking_time']}</td><td>{$row['name']}</td><td>{$row['phone_number']}</td></tr>";
                 }
                 ?>
             </table>
