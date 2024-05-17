@@ -90,7 +90,7 @@ $chairs = $conn->query($sql);
         .chair {
             width: 120px;
             height: 150px;
-            background: url('https://example.com/chair-icon.png') no-repeat center center;
+            background: url('https://cdn-icons-png.flaticon.com/512/2271/2271403.png') no-repeat center center;
             background-size: contain;
             border: 2px solid #ccc;
             border-radius: 5px;
