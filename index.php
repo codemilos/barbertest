@@ -88,20 +88,29 @@ $chairs = $conn->query($sql);
             margin-top: 20px;
         }
         .chair {
-            padding: 20px;
-            border: 1px solid #ccc;
+            width: 120px;
+            height: 150px;
+            background: url('https://example.com/chair-icon.png') no-repeat center center;
+            background-size: contain;
+            border: 2px solid #ccc;
             border-radius: 5px;
-            background: #f9f9f9;
             text-align: center;
             cursor: pointer;
             transition: background 0.3s;
+            position: relative;
         }
         .chair:hover {
-            background: #e9e9e9;
+            background-color: #e9e9e9;
         }
         .chair.selected {
-            background: #77a9d1;
-            color: #fff;
+            border-color: #77a9d1;
+        }
+        .chair h3 {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            margin: 0;
+            color: #333;
         }
         form {
             margin-top: 20px;
